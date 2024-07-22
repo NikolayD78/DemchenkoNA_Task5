@@ -16,9 +16,12 @@ import java.util.Set;
 
 @Entity
 @Data
+@Table(name = "account")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Account {
 
-    public Account(Integer account_pool_id, String account_number,boolean bussy){
+    public Account(Account_pool account_pool_id, String account_number,boolean bussy){
         this.account_pool_id = account_pool_id;
         this.account_number = account_number;
         this.bussy=bussy;
@@ -28,8 +31,15 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    @Column(name = "account_pool_id")
-    Integer account_pool_id;
+    //@Column(name = "account_pool_id")
+    //Integer account_pool_id;
+
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "account_pool_id")
+    @Getter
+    @Setter
+    private Account_pool account_pool_id;
 
     @Column(name = "account_number", columnDefinition = "varchar(25)")
     String account_number;

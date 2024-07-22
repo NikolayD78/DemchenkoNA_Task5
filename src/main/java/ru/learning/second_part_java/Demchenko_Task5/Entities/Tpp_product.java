@@ -33,7 +33,9 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Tpp_product")
+@Table(name = "tpp_product")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tpp_product {
 
     public Tpp_product(BigInteger product_code_id,
@@ -145,5 +147,13 @@ public class Tpp_product {
     //    state VARCHAR(50)
     @Column(name = "state", columnDefinition = "varchar(50)")
     String state;
+
+// ****************
+// СВЯЗИ
+// ****************
+@OneToMany(mappedBy = "product_id", cascade = CascadeType.ALL, orphanRemoval = true)
+@Getter //!!!!
+@Setter //!!!!
+Set<Agreement> agreement;
 
 }

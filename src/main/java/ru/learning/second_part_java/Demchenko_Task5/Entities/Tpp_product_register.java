@@ -20,11 +20,13 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Tpp_product_register")
+@Table(name = "tpp_product_register")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tpp_product_register {
 
     public Tpp_product_register(BigInteger product_id,
-                                String type,
+                                Tpp_ref_product_register_type type,
                                 BigInteger account,
                                 String currency_code,
                                 String state,
@@ -49,9 +51,16 @@ public class Tpp_product_register {
     BigInteger product_id;
 
     //type VARCHAR(100) NOT NULL,
-    @Column(name = "type", nullable = false, columnDefinition = "varchar(100)")
-    @NonNull
-    String type;
+    //@Column(name = "type", nullable = false, columnDefinition = "varchar(100)")
+    //@NonNull
+    //String type;
+
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "type")
+    @Getter
+    @Setter
+    private Tpp_ref_product_register_type type;
 
     //account BIGINT,
     @Column(name = "account")

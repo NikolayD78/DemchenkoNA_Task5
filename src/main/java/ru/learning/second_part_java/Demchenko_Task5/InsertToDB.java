@@ -1,3 +1,4 @@
+// Бин для доступа к данным в БД: инсерты, селекты, апдейты во все нужные нам таблицы
 package ru.learning.second_part_java.Demchenko_Task5;
 
 import lombok.Getter;
@@ -6,10 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Component;
 import ru.learning.second_part_java.Demchenko_Task5.Entities.*;
+import ru.learning.second_part_java.Demchenko_Task5.Enums.RateType;
+import ru.learning.second_part_java.Demchenko_Task5.Enums.States;
 import ru.learning.second_part_java.Demchenko_Task5.Repositories.*;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class InsertToDB {
@@ -57,7 +62,7 @@ public class InsertToDB {
 
 
     // инсерты
-    void InsToAccount(Integer account_pool_id, String account_number, boolean bussy)
+    void InsToAccount(Account_pool account_pool_id, String account_number, boolean bussy)
     {
         Account account1=new Account(account_pool_id,account_number,bussy);
         a_r.save(account1);
@@ -73,7 +78,7 @@ public class InsertToDB {
         ap_r.save(account_pool1);
     }
 
-    void InsToAgreement(Integer product_id,
+    public Agreement InsToAgreement(Tpp_product product_id,
                         String general_agreement_id,
                         String supplementary_agreement_id,
                         String arrangement_type,
@@ -95,7 +100,8 @@ public class InsertToDB {
                         Double maximal_interest_rate,
                         Double maximal_interest_rate_coefficient,
                         String maximal_interest_rate_coefficient_action)
-    {
+    {   Agreement agreement_inserted;
+
         Agreement agreement1=new Agreement(product_id, general_agreement_id, supplementary_agreement_id,
                  arrangement_type, sheduler_job_id, number, opening_date,
                  closing_date, cancel_date, validity_duration, cancellation_reason,
@@ -104,10 +110,11 @@ public class InsertToDB {
                  minimum_interest_rate_coefficient, minimum_interest_rate_coefficient_action,
                  maximal_interest_rate, maximal_interest_rate_coefficient,
                  maximal_interest_rate_coefficient_action);
-        agr_r.save(agreement1);
+        agreement_inserted=agr_r.save(agreement1);
+        return agreement_inserted;
     }
 
-    void InsToTpp_product(BigInteger product_code_id,
+    public Tpp_product InsToTpp_product(BigInteger product_code_id,
                           BigInteger client_id,
                           String type,
                           String number,
@@ -120,11 +127,18 @@ public class InsertToDB {
                           Double nso,
                           Double threshold_amount,
                           String requisite_type,
-                          String interest_rate_type,
+                          RateType interest_rate_type,
                           Double tax_rate,
                           String reasone_close,
                           String state)
-    {
+    {   String interest_rate_type_str;
+        Tpp_product tpp_product_inserted;
+
+        if(interest_rate_type==RateType.DIFF)
+            interest_rate_type_str="дифференцированная";
+        else
+            interest_rate_type_str="прогрессивная";
+
         Tpp_product tpp_product1=new Tpp_product(product_code_id,
                 client_id,
                 type,
@@ -138,32 +152,52 @@ public class InsertToDB {
                 nso,
                 threshold_amount,
                 requisite_type,
-                interest_rate_type,
+                interest_rate_type_str,
                 tax_rate,
                 reasone_close,
                 state);
-        tpp_p_r.save(tpp_product1);
+        tpp_product_inserted=tpp_p_r.save(tpp_product1);
+        return tpp_product_inserted;
     }
 
-    void InsToTpp_product_register(BigInteger product_id,
-                                       String type,
+     public Tpp_product_register InsToTpp_product_register(BigInteger product_id,
+                                       Tpp_ref_product_register_type type,
                                        BigInteger account,
                                        String currency_code,
-                                       String state,
+                                       States state,
                                        String account_number)
     {
+
+        Tpp_product_register tpp_product_register_inserted;
+        String currState;
+
+        currState="NOT DEFINED";
+        if (state==States.OPEN)
+            currState="OPEN";
+        if (state==States.CLOSED)
+            currState="CLOSED";
+        if (state==States.RESERVED)
+            currState="RESERVED";
+        if (state==States.DELETED)
+            currState="DELETED";
+
         Tpp_product_register tpp_product_register1=new Tpp_product_register(product_id,
-                type, account, currency_code, state, account_number);
-        tpp_pr_r.save(tpp_product_register1);
+                type, account, currency_code, currState, account_number);
+        tpp_product_register_inserted=tpp_pr_r.save(tpp_product_register1);
+
+        return tpp_product_register_inserted;
     }
 
-    void InsToTpp_ref_account_type(String value)
+    Tpp_ref_account_type InsToTpp_ref_account_type(String value)
     {
+        Tpp_ref_account_type tpp_ref_account_type_inserted;
+
         Tpp_ref_account_type tpp_ref_account_type1=new Tpp_ref_account_type(value);
-        tpp_rat_r.save(tpp_ref_account_type1);
+        tpp_ref_account_type_inserted=tpp_rat_r.save(tpp_ref_account_type1);
+        return tpp_ref_account_type_inserted;
     }
 
-    void InsToTpp_ref_product_class( String value,
+    Tpp_ref_product_class InsToTpp_ref_product_class( String value,
                                      String gbi_code,
                                      String gbi_name,
                                      String product_row_code,
@@ -171,26 +205,65 @@ public class InsertToDB {
                                      String subclass_code,
                                      String subclass_name)
     {
+        Tpp_ref_product_class tpp_ref_product_class_inserted;
         Tpp_ref_product_class tpp_ref_product_class1=new Tpp_ref_product_class(value,
                  gbi_code, gbi_name, product_row_code, product_row_name,
                  subclass_code, subclass_name);
-        tpp_rpc_r.save(tpp_ref_product_class1);
+        tpp_ref_product_class_inserted=tpp_rpc_r.save(tpp_ref_product_class1);
+        return tpp_ref_product_class_inserted;
     }
 
     void InsToTpp_ref_product_register_type(String value,
                                             String register_type_name,
-                                            String product_class_code,
+                                            Tpp_ref_product_class product_class_code,
                                             Date register_type_start_date,
                                             Date register_type_end_date,
-                                            String account_type)
+                                            Tpp_ref_account_type account_type)
     {
         Tpp_ref_product_register_type Tpp_ref_product_register_type1=new Tpp_ref_product_register_type(value, register_type_name, product_class_code, register_type_start_date, register_type_end_date, account_type);
         tpp_rprt_r.save(Tpp_ref_product_register_type1);
     }
 
-    // Селекты
+    //********************************************
+    // !!! СЕЛЕКТЫ !!!
+    //********************************************
+    public Account_pool sel1Account_Pool(String val)
+    {return ap_r.selectAcс_poolFromAcс_pool_1param(val);}
 
-    Account_pool sel1Account_Pool(String val)
-    {return ap_r.selectAcс_poolFromAcс_pool(val);}
+    public Account_pool sel1Account_Pool(String branchCode, String currencyCode, String mdmCode, String priorityCode, String registryTypeCode)
+    {return ap_r.selectAcс_poolFromAcс_pool_5param(branchCode, currencyCode, mdmCode, priorityCode, registryTypeCode);}
+
+    // по ID пула
+    public List<Account> sel1Account(Integer accountPoolId)
+    {return a_r.selectAcсount_FromAccount_1param(accountPoolId);}
+
+    // по номеру счета
+    public List<Account> sel2Account(String account_number)
+    {return a_r.selectAcсount_FromAccount_2param(account_number);}
+
+    public List<Tpp_product_register> sel1Tpp_product_register(BigInteger product_id)
+    {return tpp_pr_r.selectProdRegFromProdReg(product_id);}
+
+    public List<Tpp_ref_product_register_type> sel1Tpp_ref_product_register_type(Integer product_class_code)
+    {return tpp_rprt_r.select1ProdRegTypeFromProdRegType(product_class_code);}
+
+    public List<Tpp_ref_product_register_type> sel2Tpp_ref_product_register_type(Integer product_class_code, String value)
+    {return tpp_rprt_r.select2ProdRegTypeFromProdRegType(product_class_code, value);}
+
+    public List<Tpp_ref_product_register_type> sel3Tpp_ref_product_register_type(String value)
+    {return tpp_rprt_r.select3ProdRegTypeFromProdRegType(value);}
+
+    public List<Tpp_product> sel1Tpp_product(String contractNumber)
+    {return tpp_p_r.selectTppProdFromTppProd(contractNumber);}
+
+    // определение уже имеющегося продукта по id
+    public Tpp_product sel2Tpp_product(Integer id)
+    {return tpp_p_r.select2TppProdFromTppProd(id);}
+
+    public List<Agreement> sel1Agreement(String numb)
+    {return agr_r.selectAgrFromAgr(numb);}
+
+    public Tpp_ref_product_class sel1Tpp_ref_product_class(String productCode)
+    {return tpp_rpc_r.selectTpp_ref_product_class(productCode);}
 
 }

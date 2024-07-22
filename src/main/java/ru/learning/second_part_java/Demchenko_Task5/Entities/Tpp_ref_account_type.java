@@ -16,7 +16,9 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Tpp_ref_account_type")
+@Table(name = "tpp_ref_account_type")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tpp_ref_account_type {
 
     public Tpp_ref_account_type(String value){
@@ -33,5 +35,14 @@ public class Tpp_ref_account_type {
     @Getter
     @Setter
     String value;
+
+// ***************
+// СВЯЗИ
+// ***************
+
+@OneToMany(mappedBy = "account_type", cascade = CascadeType.ALL, orphanRemoval = true)
+@Getter //!!!!
+@Setter //!!!!
+Set<Tpp_ref_product_register_type> tpp_ref_product_register_type;
 
 }

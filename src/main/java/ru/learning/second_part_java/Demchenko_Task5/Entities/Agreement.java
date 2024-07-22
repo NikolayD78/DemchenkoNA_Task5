@@ -37,10 +37,12 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Agreement")
+@Table(name = "agreement")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Agreement {
 
-    public Agreement(Integer product_id,
+    public Agreement(Tpp_product product_id,
                      String general_agreement_id,
                      String supplementary_agreement_id,
                      String arrangement_type,
@@ -87,14 +89,19 @@ public class Agreement {
 
     }
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
+    //@Column(name = "product_id")
+    //Integer product_id;
 
-    @Column(name = "product_id")
-    Integer product_id;
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "product_id")
+    @Getter
+    @Setter
+    private Tpp_product product_id;
 
     @Column(name = "general_agreement_id", columnDefinition = "varchar(50)")
     String general_agreement_id;
@@ -158,10 +165,5 @@ public class Agreement {
 
     @Column(name = "maximal_interest_rate_coefficient_action", columnDefinition = "varchar(50)")
     String maximal_interest_rate_coefficient_action;
-
-    //@OneToMany(mappedBy = "user1", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Getter //!!!!
-    //@Setter //!!!!
-    //Set<Logins> logins;
 
 }

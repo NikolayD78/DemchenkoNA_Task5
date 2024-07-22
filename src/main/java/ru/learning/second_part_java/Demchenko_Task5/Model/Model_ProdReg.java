@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
+
 
 @Getter
 @Setter
 public class Model_ProdReg {
 
-    private int id;
+    private BigInteger instanceId; //=product_id
     private String registryTypeCode;
     private String accountType;
     private String currencyCode;

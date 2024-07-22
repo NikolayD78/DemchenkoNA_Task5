@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Account_pool")
+@Table(name = "account_pool")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Account_pool {
@@ -50,9 +50,11 @@ public class Account_pool {
     @Column(name = "registry_type_code", columnDefinition = "varchar(50)")
     String registry_type_code;
 
-    //@OneToMany(mappedBy = "user1", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Getter //!!!!
-    //@Setter //!!!!
-    //Set<Logins> logins;
+// !!! СВЯЗИ
+
+    @OneToMany(mappedBy = "account_pool_id", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Getter //!!!!
+    @Setter //!!!!
+    Set<Account> account;
 
 }

@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: ru.learning.second_part_java.Demchenko_Task5.DemchenkoTask5A
+ pplication
+

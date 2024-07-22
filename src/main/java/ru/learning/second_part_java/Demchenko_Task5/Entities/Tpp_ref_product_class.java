@@ -21,7 +21,9 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Tpp_ref_product_class")
+@Table(name = "tpp_ref_product_class")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tpp_ref_product_class {
 
     public Tpp_ref_product_class(    String value,
@@ -71,5 +73,12 @@ public class Tpp_ref_product_class {
     //  subclass_name VARCHAR(100)
     @Column(name = "subclass_name", columnDefinition = "varchar(100)")
     String subclass_name;
+
+    // СВЯЗИ!!!
+
+    @OneToMany(mappedBy = "product_class_code", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Getter //!!!!
+    @Setter //!!!!
+    Set<Tpp_ref_product_register_type> tpp_ref_product_register_type;
 
 }
