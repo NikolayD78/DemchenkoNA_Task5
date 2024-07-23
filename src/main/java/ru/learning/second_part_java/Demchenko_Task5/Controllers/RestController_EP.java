@@ -23,6 +23,8 @@ public class RestController_EP {
     @PostMapping(value = "corporate-settlement-instance/create")
     public ResponseEntity<String> createProdReg(@RequestBody Model_EP request) {
         retValue = service_EP.create_EP(request);
+        System.out.println("retValue "+retValue);
+
         statusRequest = Integer.valueOf(retValue.substring(0, 3));
         retValue = retValue.substring(3);
 

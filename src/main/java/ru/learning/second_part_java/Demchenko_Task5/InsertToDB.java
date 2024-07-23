@@ -60,8 +60,56 @@ public class InsertToDB {
     @Autowired
     Tpp_ref_product_register_typeRepo tpp_rprt_r;
 
+    Account_pool tmp_Account_pool1,tmp_Account_pool2;
+    List<Tpp_ref_product_register_type> tmpListTpp_ref_product_register_type;
+    Tpp_ref_product_class tmpTpp_ref_product_class1, tmpTpp_ref_product_class2;
+    Tpp_ref_account_type tmpTpp_ref_account_type;
 
+    // ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ
+    public void init_DB()
+    {
+        // так как разработано в IDEA Community, то SQL файлы не допускаются для Docker,
+        // заполним таблицы данными вручную
+        //System.out.println("Бины старт");
+        InsToAccount_pool("0022", "800", "15", "00", "03.012.002_47533_ComSoLd");
+        InsToAccount_pool("0021", "500", "13", "00", "02.001.005_45343_CoDowFF");
+
+        tmp_Account_pool1=sel1Account_Pool("03.012.002_47533_ComSoLd");
+        tmp_Account_pool2=sel1Account_Pool("02.001.005_45343_CoDowFF");
+
+        InsToAccount(tmp_Account_pool1,"475335516415314841861",false);
+        InsToAccount(tmp_Account_pool1,"4753321651354151",false);
+        InsToAccount(tmp_Account_pool1,"4753352543276345",false);
+        InsToAccount(tmp_Account_pool1,"40701810400000000001",false);
+        InsToAccount(tmp_Account_pool2,"453432352436453276",false);
+        InsToAccount(tmp_Account_pool2,"45343221651354151",false);
+        InsToAccount(tmp_Account_pool2,"4534352543276345",false);
+
+        tmpTpp_ref_account_type=InsToTpp_ref_account_type("Клиентский");
+        InsToTpp_ref_account_type("Внутрибанковский");
+
+        tmpTpp_ref_product_class1=InsToTpp_ref_product_class("03.012.002", "03", "Розничный бизнес", "012", "Драг. металлы", "002", "Хранение");
+        InsToTpp_ref_product_register_type("03.012.002_47533_ComSoLd", "Хранение ДМ.", tmpTpp_ref_product_class1, null,null,tmpTpp_ref_account_type);
+
+        tmpTpp_ref_product_class2=InsToTpp_ref_product_class("02.001.005", "02", "Розничный бизнес", "001", "Сырье", "005", "Продажа");
+        InsToTpp_ref_product_register_type("02.001.005_45343_CoDowFF", "Серебро. Выкуп.", tmpTpp_ref_product_class2, null,null, tmpTpp_ref_account_type);
+
+        tmpListTpp_ref_product_register_type=sel1Tpp_ref_product_register_type(tmpTpp_ref_product_class2.getId());
+        for(Tpp_ref_product_register_type f : tmpListTpp_ref_product_register_type)
+            InsToTpp_product_register(BigInteger.valueOf(1),f, BigInteger.valueOf(123123),"RUB", States.OPEN,"numb_acc1");
+
+        tmpListTpp_ref_product_register_type=sel1Tpp_ref_product_register_type(tmpTpp_ref_product_class2.getId());
+        for(Tpp_ref_product_register_type f : tmpListTpp_ref_product_register_type)
+        {
+            InsToTpp_product_register(BigInteger.valueOf(1),f,BigInteger.valueOf(123124),"USD",States.RESERVED,"numb_acc2");
+            InsToTpp_product_register(BigInteger.valueOf(3),f,BigInteger.valueOf(123125),"EUR",States.CLOSED,"numb_acc3");
+        }
+        //System.out.println("Бины стоп");
+    }
+
+    // ******************************
     // инсерты
+    // ******************************
     void InsToAccount(Account_pool account_pool_id, String account_number, boolean bussy)
     {
         Account account1=new Account(account_pool_id,account_number,bussy);
@@ -228,18 +276,18 @@ public class InsertToDB {
     // !!! СЕЛЕКТЫ !!!
     //********************************************
     public Account_pool sel1Account_Pool(String val)
-    {return ap_r.selectAcс_poolFromAcс_pool_1param(val);}
+    {return ap_r.selectAcc_poolFromAcc_pool_1param(val);}
 
     public Account_pool sel1Account_Pool(String branchCode, String currencyCode, String mdmCode, String priorityCode, String registryTypeCode)
-    {return ap_r.selectAcс_poolFromAcс_pool_5param(branchCode, currencyCode, mdmCode, priorityCode, registryTypeCode);}
+    {return ap_r.selectAcc_poolFromAcc_pool_5param(branchCode, currencyCode, mdmCode, priorityCode, registryTypeCode);}
 
     // по ID пула
     public List<Account> sel1Account(Integer accountPoolId)
-    {return a_r.selectAcсount_FromAccount_1param(accountPoolId);}
+    {return a_r.selectAccount_FromAccount_1param(accountPoolId);}
 
     // по номеру счета
     public List<Account> sel2Account(String account_number)
-    {return a_r.selectAcсount_FromAccount_2param(account_number);}
+    {return a_r.selectAccount_FromAccount_2param(account_number);}
 
     public List<Tpp_product_register> sel1Tpp_product_register(BigInteger product_id)
     {return tpp_pr_r.selectProdRegFromProdReg(product_id);}

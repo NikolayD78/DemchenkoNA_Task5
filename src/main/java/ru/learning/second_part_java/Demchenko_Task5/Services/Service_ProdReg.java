@@ -3,6 +3,7 @@ package ru.learning.second_part_java.Demchenko_Task5.Services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.learning.second_part_java.Demchenko_Task5.DemchenkoTask5Application;
 import ru.learning.second_part_java.Demchenko_Task5.Entities.Account;
 import ru.learning.second_part_java.Demchenko_Task5.Entities.Account_pool;
 import ru.learning.second_part_java.Demchenko_Task5.Entities.Tpp_product_register;
@@ -51,6 +52,13 @@ public class Service_ProdReg {
         //str=str+"TrainRegion "    +m_ProdReg.getTrainRegion()+"\n";
         //str=str+"SalesCode "    +m_ProdReg.getSalesCode()+"\n";
 
+        if (DemchenkoTask5Application.InsDB_Bean==null)
+        {
+            insToDB.init_DB();
+            DemchenkoTask5Application.InsDB_Bean=insToDB; // чтобы при повторных тестах не вызывалась инициализация базы (она же уже выполнена)
+        }
+
+
         // шаг 1 проверка, Если не заполнено хотя бы одно обязательное поле (см. Request.Body)
         //вернуть Статус: 400/Bad Request, Текст: Имя обязательного параметра <значение> не заполнено
         //обязательное поле только одно, а именно: instanceId, его и проверим на наличие
@@ -63,9 +71,13 @@ public class Service_ProdReg {
         // и у результата отобрать строки по условию tpp_product_register.type == Request.Body.registryTypeCode.
         // Если результат отбора не пуст, значит имеются повторы
         tmplstTpp_product_register=insToDB.sel1Tpp_product_register(m_ProdReg.getInstanceId());
-        for (Tpp_product_register lst1: tmplstTpp_product_register)
-            if (lst1.getType().equals(m_ProdReg.getRegistryTypeCode()))
-                statusRequest=400;
+        tmplstTpp_ref_product_register_type=insToDB.sel3Tpp_ref_product_register_type(m_ProdReg.getRegistryTypeCode());
+        if(tmplstTpp_ref_product_register_type.size()>0) {
+            tmpTpp_ref_product_register_type = tmplstTpp_ref_product_register_type.get(0);
+            for (Tpp_product_register lst1 : tmplstTpp_product_register)
+                if (lst1.getType().getId()==tmpTpp_ref_product_register_type.getId()) // сопоставляем по ID-шнику, так как это ссылочное поле!
+                    statusRequest = 400;
+        }
 
         if (statusRequest==400) {
             str = "400" + "Параметр registryTypeCode тип регистра " + m_ProdReg.getRegistryTypeCode() + " уже существует для ЭП с ИД  " + m_ProdReg.getInstanceId();

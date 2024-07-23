@@ -1,8 +1,10 @@
 package ru.learning.second_part_java.Demchenko_Task5.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.learning.second_part_java.Demchenko_Task5.DemchenkoTask5Application;
 import ru.learning.second_part_java.Demchenko_Task5.Entities.*;
 import ru.learning.second_part_java.Demchenko_Task5.Enums.RateType;
 import ru.learning.second_part_java.Demchenko_Task5.Enums.States;
@@ -50,6 +52,7 @@ public class Service_EP {
         retStr_registerId="*";
         retStr_supplementaryAgreementId="*";
         // ---------------------------------------------
+        // >> НИЖЕСЛЕДУЮЩИЙ КОД НУЖЕН БЫЛ ДЛЯ ОТЛАДКИ
         retStr = String.valueOf(m_EP.getInstanceId());
         retStr = retStr + " m_EP.getProductType(): " + m_EP.getProductType() + "\n";
         retStr = retStr + " m_EP.getProductCode() " + m_EP.getProductCode() + "\n";
@@ -108,6 +111,10 @@ public class Service_EP {
             retStr = retStr + " getMaximalnterestRateCoefficient() " + String.valueOf(f.getMaximalInterestRateCoefficient()) + "\n";
             retStr = retStr + " getMaximalnterestRateCoefficientAction() " + f.getMaximalInterestRateCoefficientAction() + "\n";
         }
+        System.out.println("ОТЛАДКА: Service_EP"+retStr);
+        // << КОНЕЦ ОТЛАДКИ
+
+        // РЕАЛИЗАЦИЯ
 
         errStr = "Нет ошибок";
         tmpTpp_product=null; // инициализация
@@ -115,6 +122,11 @@ public class Service_EP {
         //Если не заполнено хотя бы одно обязательное поле (см. Request.Body)
         //вернуть Статус: 400/Bad Request, Текст: Имя обязательного параметра <значение> не заполнено
 
+        if (DemchenkoTask5Application.InsDB_Bean==null)
+            {
+                insToDB.init_DB();
+                DemchenkoTask5Application.InsDB_Bean=insToDB; // чтобы при повторных тестах не вызывалась инициализация базы (она же уже выполнена)
+            }
 
         if (m_EP.getProductType() == null) errStr = errStr + "ProductType" + "\n";
         if (m_EP.getProductCode() == null) errStr = errStr + "ProductCode" + "\n";
@@ -155,7 +167,7 @@ public class Service_EP {
             for (Tpp_product f : tpp1) {
                 //вернуть Статус: 400/Bad Request, Текст: Параметр ContractNumber № договора <значение> уже существует
                 // для ЭП с ИД  <значение1>.
-                errStr = errStr + "400Текст: Параметр ContractNumber № договора " + m_EP.getContractNumber() + " уже существует\n" +
+                errStr = errStr + "Параметр ContractNumber № договора " + m_EP.getContractNumber() + " уже существует\n" +
                         " для ЭП с ИД=" + f.getId();
                 break;
             }
